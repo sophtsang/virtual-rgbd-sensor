@@ -4,8 +4,9 @@ In Rust!
 ## Table of Contents 
 1) [Features](#features)
 2) [Recent Updates](#recent-updates)
-3) [Instructions](#instructions)
-4) [Debugging Notes](#debugging-notes)
+4) [Instructions](#instructions)
+5) [Zenoh Mappings](#zenoh-mappings)
+6) [Debugging Notes](#debugging-notes)
 
 ## Features:
 1) Converted 32-channel RoboSense LiDAR outputs in the form of .pcap or MSOP/DIFOP packets to PointCloud2: ```(x, y, z, intensity, cluster_id)```. Implementation explanation is [here](src/rslidar/lidar.pdf).
