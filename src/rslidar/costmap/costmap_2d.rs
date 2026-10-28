@@ -70,9 +70,9 @@ impl Default for CostmapParams {
             min_obstacle_height: -3.0,
             max_obstacle_height: 3.0,
             obstacle_max_range: 15.0,
-            obstacle_min_range: 0.0,
+            obstacle_min_range: 0.2,
             raytrace_max_range: 20.0,
-            raytrace_min_range: 0.0,
+            raytrace_min_range: 0.2,
             clearing_az_res_deg: 0.4,
             inflation_radius: 0.3,
             cost_scaling_factor: 10.0,
@@ -193,7 +193,7 @@ impl Costmap {
     pub fn new(params: &CostmapParams) -> Self {
         let size_x = (params.width / params.resolution).round() as usize;
         let size_y = (params.height / params.resolution).round() as usize;
-        let default_value = if params.track_unknown_space { NO_INFORMATION } else { FREE_SPACE };
+        let default_value = NO_INFORMATION;
         let master = Costmap2D::new(size_x, size_y, params.resolution, params.origin_x, params.origin_y, default_value);
         let obstacles = ObstacleLayer::new(params, &master, default_value);
         let inflation = InflationLayer::new(params, &master);
@@ -211,7 +211,7 @@ impl Costmap {
         }
         self.master.reset_map(bounds, self.default_value);
         self.obstacles.update_costs(&mut self.master, bounds);
-        self.inflation.update_costs(&mut self.master, bounds);
+        // self.inflation.update_costs(&mut self.master, bounds);
     }
 
     pub fn master(&self) -> &Costmap2D {

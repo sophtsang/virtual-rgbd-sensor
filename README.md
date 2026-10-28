@@ -1,5 +1,5 @@
 # Virtual RGBD Sensor
-In Rust!
+In Rust! Read the documentation [here](/documentation/report.pdf).
 
 ## Table of Contents 
 1) [Features](#features)
@@ -16,25 +16,34 @@ In Rust!
   <source src="/demos/yay.mp4" type="video/mp4">
 </video> -->
 
-3) Ported cpp ```nav2_costmap_2d``` point cloud to costmap conversion to Rust. Implementation details are contained [here](/src/rslidar/costmap).
+3) Adopted cpp ```nav2_costmap_2d``` point cloud to costmap conversion logic for outputting occupancy grids in Rust. Implementation details are contained [here](/src/rslidar/costmap).
 ![costmap_demo](/demos/occupancy_grid.png)
 
 ## Recent Updates:
 
 |  Date     | Changelog / Update Notes |
 |:----------|:-----------|
+| 10/17/26 | - Tweaked ```costmap``` to output occupancy grids instead with ```NO_INFORMATION, LETHAL_OBSTACLE, FREE_SPACE``` elements. | 
 | 9/26/26  | - Rewrote [ros2-planning costmap_2d](https://github.com/ros-planning/navigation/tree/noetic-devel/costmap_2d/src) implementation in Rust, also integrated costmap construction directly after `RangeGraph` initialization |
 | 9/14/26  | - Integrated Two-Layer-Graph Clustering with the decoding of MSOP/DIFOP packets for optimized segmentation while point cloud are being processed. Specifically during the construction of the range and set graphs. |
 | 9/12/26   | - Tested ```rslidar_sdk_node.rs``` on online LiDAR and offline .pcap files. Also integrated simple Bevy visualizer for point clouds. | 
 | 9/8/26   | - Rewrote cpp ```rslidar_sdk``` with ```RSHeliosDecoder``` for RoboSense 32-channel LiDAR specifically. This is for converting offline .pcap or online MSOP/DIFOP packets to point clouds | 
 
 ## Instructions:
-Run Zenoh publisher:
+Have LiDAR perception results output via Zenoh publisher or shared memory, and listen to these
+outputs by running the visualizer. 
+
+To run Zenoh publisher:
 ```bash
-RUSTFLAGS="-C link-arg=-fuse-ld=gold" cargo run --bin rslidar_viz --release
+RUSTFLAGS="-C link-arg=-fuse-ld=gold" cargo run --bin zenoh_wrapper --release
 ```
 
-Run Zenoh subscriber:
+To run Zenoh shm:
+```bash
+RUSTFLAGS="-C link-arg=-fuse-ld=gold" cargo run --bin shm_wrapper --release
+```
+
+To run Zenoh subscriber (able to listen to publisher or shm):
 ```bash
 RUSTFLAGS="-C link-arg=-fuse-ld=gold" cargo run --bin zenoh_viz --release
 ```
@@ -51,7 +60,7 @@ A brief overview on the Zenoh pub/sub elements in ```virtual-rgbd-sensor```:
 ### Publishers:
 1) ```rslidar/points/raw```: raw ```(x, y, z, intensity)``` point cloud from RoboSense LiDAR MSOP/DIFOP packets
 2) ```rslidar/points/segmented```: segmented ```(x, y, z, cluster_id)``` point cloud from ```segmentation.rs```'s two-layer-graph clustering
-3) ```rslidar/costmap```: occupancy grid containing free space, obstacle regions, and inflation layers from Rust implementation of ```ros-planning costmap_2d``` in ```/costmap```
+3) ```rslidar/costmap```: occupancy grid containing free space, obstacle regions, and no information layers (from occlusion) from Rust implementation of ```ros-planning costmap_2d``` in ```/costmap```
 
 ### Subscribers:
 In ```zenoh_test.rs```, there are example point cloud and costmap subscribers in ```_points_subscriber``` and ```_costmap_subscriber```, respectively.
